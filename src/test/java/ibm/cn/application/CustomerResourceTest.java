@@ -12,10 +12,10 @@ public class CustomerResourceTest {
     @Test
     public void testHelloEndpoint() {
         given()
-          .when().get("/micro/customer")
+          .when().get("/micro/customer/resource")
           .then()
              .statusCode(200)
-             .body(is("Hello RESTEasy"));
+             .body(is("CustomerResource response"));
     }
 
 }
