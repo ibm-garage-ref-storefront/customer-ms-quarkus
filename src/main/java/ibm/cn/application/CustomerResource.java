@@ -40,8 +40,9 @@ public class CustomerResource {
             JSONArray fields = new JSONArray();
             body.put("fields", fields);
             body.put("limit", 1);
-          
-            return cdb.getUsername(body);
+            Response r = cdb.getUsername(body);
+            r.getHeaders().remove("Transfer-Encoding");
+            return r;
 
         }
         catch (Exception e){
