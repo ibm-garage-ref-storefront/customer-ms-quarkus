@@ -142,15 +142,22 @@ __  ____  __  _____   ___  __ ____  ______
 
 #### Creating a native executable
 
-TBD
+Note: In order to run the native executable, you need to install GraalVM. For instructions on how to install it, refer [this](https://quarkus.io/guides/building-native-image).
+
+You can create a native executable using:
+```shell script
+./mvnw package -Pnative
+```
+
+Note: If you get errors while executing the above command, refer this [doc](https://quarkus.io/guides/building-native-image#configuring-graalvm).
+
+You can then execute your native executable with the below command:
 
 ```
-WARNING: An illegal reflective access operation has occurred
-WARNING: Illegal reflective access by org.jboss.resteasy.microprofile.client.header.ComputedHeaderValueFiller (file:/Users/Hemankita1/IBM/CN_Ref/Quarkus/customer-ms-quarkus/target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar) to constructor java.lang.invoke.MethodHandles$Lookup(java.lang.Class)
-WARNING: Please consider reporting this to the maintainers of org.jboss.resteasy.microprofile.client.header.ComputedHeaderValueFiller
-WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-WARNING: All illegal access operations will be denied in a future release
+./target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826
 ```
+
+If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
 
 #### Running the application using docker
 
@@ -168,19 +175,24 @@ docker build -f src/main/docker/Dockerfile.jvm -t customer-ms-quarkus .
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e quarkus.datasource.username=dbuser -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -p 8087:8080 customer-ms-quarkus
+docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -p 8087:8080 customer-ms-quarkus
 ```
 
 - Build the native docker image and run the application.
 
-TBD
-
+For native docker image, package the application using native profile.
+```shell script
+./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
-WARNING: An illegal reflective access operation has occurred
-WARNING: Illegal reflective access by org.jboss.resteasy.microprofile.client.header.ComputedHeaderValueFiller (file:/Users/Hemankita1/IBM/CN_Ref/Quarkus/customer-ms-quarkus/target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar) to constructor java.lang.invoke.MethodHandles$Lookup(java.lang.Class)
-WARNING: Please consider reporting this to the maintainers of org.jboss.resteasy.microprofile.client.header.ComputedHeaderValueFiller
-WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-WARNING: All illegal access operations will be denied in a future release
+
+Build the docker image using `Dockerfile.native`.
+```shell script
+docker build -f src/main/docker/Dockerfile.native -t customer-ms-quarkus-native .
+```
+
+Run the application.
+```shell script
+docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -p 8087:8080 customer-ms-quarkus-native
 ```
 
 ### Validating the application
