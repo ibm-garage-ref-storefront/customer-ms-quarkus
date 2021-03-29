@@ -304,7 +304,7 @@ Note: Unnecessary use of -X or --request, GET is already inferred.
 
 - You can access the swagger api at http://localhost:8080/q/swagger-ui/
 
-![Orders swagger api](static/orders_swagger_api.png?raw=true)
+![Customer swagger api](static/customer_swagger_api.png?raw=true)
 
 Note: If you are running using docker, use `8087` instead of `8080` as port.
 
