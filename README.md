@@ -325,14 +325,14 @@ Do a clean install to generate necessary artifacts.
 If it is successful, you will see something like this.
 
 ```
-[INFO] --- maven-install-plugin:2.4:install (default-install) @ orders-ms-quarkus ---
-[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/orders-ms-quarkus/target/orders-ms-quarkus-1.0.0-SNAPSHOT.jar to /Users/Hemankita1/.m2/repository/ibm/cn/orders-ms-quarkus/1.0.0-SNAPSHOT/orders-ms-quarkus-1.0.0-SNAPSHOT.jar
-[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/orders-ms-quarkus/pom.xml to /Users/Hemankita1/.m2/repository/ibm/cn/orders-ms-quarkus/1.0.0-SNAPSHOT/orders-ms-quarkus-1.0.0-SNAPSHOT.pom
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ customer-ms-quarkus ---
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/customer-ms-quarkus/target/customer-ms-quarkus-1.0.0-SNAPSHOT.jar to /Users/Hemankita1/.m2/repository/ibm/cn/customer-ms-quarkus/1.0.0-SNAPSHOT/customer-ms-quarkus-1.0.0-SNAPSHOT.jar
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/customer-ms-quarkus/pom.xml to /Users/Hemankita1/.m2/repository/ibm/cn/customer-ms-quarkus/1.0.0-SNAPSHOT/customer-ms-quarkus-1.0.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  32.747 s
-[INFO] Finished at: 2021-03-26T17:04:15+05:30
+[INFO] Total time:  32.439 s
+[INFO] Finished at: 2021-03-29T11:15:53+05:30
 [INFO] ------------------------------------------------------------------------
 ```
 
@@ -350,32 +350,32 @@ If it is successful, you will see something like this.
 $ ./mvnw sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=19abfbce59f1f73b9471ab326163c0e45800a8f3
 [INFO] Scanning for projects...
 [INFO]
-[INFO] ----------------------< ibm.cn:orders-ms-quarkus >----------------------
-[INFO] Building orders-ms-quarkus 1.0.0-SNAPSHOT
+[INFO] ---------------------< ibm.cn:customer-ms-quarkus >---------------------
+[INFO] Building customer-ms-quarkus 1.0.0-SNAPSHOT
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO]
-[INFO] --- sonar-maven-plugin:3.7.0.1746:sonar (default-cli) @ orders-ms-quarkus ---
+[INFO] --- sonar-maven-plugin:3.7.0.1746:sonar (default-cli) @ customer-ms-quarkus ---
 [INFO] User cache: /Users/Hemankita1/.sonar/cache
 [INFO] SonarQube version: 8.7.1
 ..........
 ..........
-[INFO] ANALYSIS SUCCESSFUL, you can browse http://localhost:9000/dashboard?id=ibm.cn%3Aorders-ms-quarkus
+[INFO] ANALYSIS SUCCESSFUL, you can browse http://localhost:9000/dashboard?id=ibm.cn%3Acustomer-ms-quarkus
 [INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
-[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=AXhuUPfKGlc8bxlXLNnl
-[INFO] Analysis total time: 15.409 s
+[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=AXh8heIpGlc8bxlXLNnm
+[INFO] Analysis total time: 16.531 s
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  18.994 s
-[INFO] Finished at: 2021-03-26T17:05:03+05:30
+[INFO] Total time:  20.859 s
+[INFO] Finished at: 2021-03-29T11:17:32+05:30
 [INFO] ------------------------------------------------------------------------
 ```
 
 - Now, access http://localhost:9000/, login using the credentials admin/admin, and then you will see something like below.
 
-![Orders SonarQube](static/orders_sonarqube.png?raw=true)
+![Customer SonarQube](static/customer_sonarqube.png?raw=true)
 
-![Orders SonarQube details](static/orders_sonarqube_details.png?raw=true)
+![Customer SonarQube details](static/customer_sonarqube_details.png?raw=true)
 
 ### Exiting the application
 
