@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.logging.Logger;
 import org.jose4j.json.internal.json_simple.JSONArray;
 import org.jose4j.json.internal.json_simple.JSONObject;
 
@@ -17,6 +18,8 @@ import ibm.cn.application.couchdb.client.CouchDBClientService;
 
 @Path("/micro/customer")
 public class CustomerResource {
+	
+	private static final Logger LOG = Logger.getLogger(CustomerResource.class);
 	
 	@Inject
 	@RestClient
@@ -30,6 +33,7 @@ public class CustomerResource {
     @Produces(MediaType.APPLICATION_JSON)
     @RolesAllowed({"user","admin"})
     public Response getCustomerByUsername() throws Exception{
+    	LOG.info("Get customer by username");
         try {
             JSONObject body = new JSONObject();
             JSONObject selector = new JSONObject();

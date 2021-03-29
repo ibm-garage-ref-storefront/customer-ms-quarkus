@@ -65,10 +65,14 @@
       <artifactId>quarkus-oidc</artifactId>
     </dependency>
     <dependency>
-	  <groupId>com.cloudant</groupId>
-	  <artifactId>cloudant-client</artifactId>
-	  <version>2.19.1</version>
-	</dependency>
+      <groupId>com.cloudant</groupId>
+      <artifactId>cloudant-client</artifactId>
+      <version>2.19.1</version>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-opentracing</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

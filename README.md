@@ -14,6 +14,8 @@ https://cloudnativereference.dev/*
     + [Get the Customer application](#get-the-customer-application)
     + [Run the CouchDB Docker Container](#run-the-couchdb-docker-container)
     + [Set Up Keycloak](#set-up-keycloak)
+    + [Run the Jaeger Docker Container](#run-the-jaeger-docker-container)
+    + [Run the SonarQube Docker Container](#run-the-sonarqube-docker-container)
     + [Run the Customer application](#run-the-customer-application)
     + [Validating the application](#validating-the-application)
     + [Exiting the application](#exiting-the-application)
@@ -81,13 +83,43 @@ python3 populate.py localhost 5984
 
 In storefront, Keycloak is used for storing users and authenticating users. To configure it, refer [Keycloak - JWT token generation](https://cloudnativereference.dev/related-repositories/keycloak/).
 
+### Run the Jaeger Docker Container
+
+Set up Jaegar for opentracing. This enables distributed tracing in your application.
+
+```
+docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+1c127fd5dfd1f4adaf892f041e4db19568ebfcc0b1961bec52a567f963014411
+```
+
+### Run the SonarQube Docker Container
+
+Set up SonarQube for code quality analysis. This will allow you to detect bugs in the code automatically and alerts the developer to fix them.
+
+```
+docker run -d --name sonarqube -p 9000:9000 sonarqube
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d --name sonarqube -p 9000:9000 sonarqube
+1b4ca4e26ceaeacdfd1f4adaf892f041e4db19568ebfcc0b1961b4ca4e26ceae
+```
+
 ### Run the Customer application
 
 #### Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
 ```shell script
-./mvnw compile quarkus:dev -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826
+./mvnw compile quarkus:dev -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831
 ```
 
 If it is successful, you will see something like this.
@@ -269,6 +301,81 @@ Note: Unnecessary use of -X or --request, GET is already inferred.
 
 * Connection #0 to host localhost left intact
 ```
+
+- You can access the swagger api at http://localhost:8080/q/swagger-ui/
+
+![Orders swagger api](static/orders_swagger_api.png?raw=true)
+
+Note: If you are running using docker, use `8087` instead of `8080` as port.
+
+- To access Jaeger UI, use http://localhost:16686/ and point the service to `customer-ms-quarkus` to access the traces.
+
+![Customer Jaeger traces](static/customer_jaeger_traces.png?raw=true)
+
+![Customer Jaeger trace details](static/customer_jaeger_trace_details.png?raw=true)
+
+- To perform code quality checks, run the below commands.
+
+Do a clean install to generate necessary artifacts.
+
+```
+./mvnw clean install
+```
+
+If it is successful, you will see something like this.
+
+```
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ orders-ms-quarkus ---
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/orders-ms-quarkus/target/orders-ms-quarkus-1.0.0-SNAPSHOT.jar to /Users/Hemankita1/.m2/repository/ibm/cn/orders-ms-quarkus/1.0.0-SNAPSHOT/orders-ms-quarkus-1.0.0-SNAPSHOT.jar
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/orders-ms-quarkus/pom.xml to /Users/Hemankita1/.m2/repository/ibm/cn/orders-ms-quarkus/1.0.0-SNAPSHOT/orders-ms-quarkus-1.0.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  32.747 s
+[INFO] Finished at: 2021-03-26T17:04:15+05:30
+[INFO] ------------------------------------------------------------------------
+```
+
+Now run sonar as follows.
+
+```
+./mvnw sonar:sonar -Dsonar.host.url=http://<sonarqube_host>:<sonarqube_port> -Dsonar.login=<sonarqube_access_token>
+```
+
+To get the sonarqube access token, login to the sonarqube ui. Then go to `User` > `My Account`. Now, select `Security` and then generate a token.
+
+If it is successful, you will see something like this.
+
+```
+$ ./mvnw sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=19abfbce59f1f73b9471ab326163c0e45800a8f3
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------------< ibm.cn:orders-ms-quarkus >----------------------
+[INFO] Building orders-ms-quarkus 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- sonar-maven-plugin:3.7.0.1746:sonar (default-cli) @ orders-ms-quarkus ---
+[INFO] User cache: /Users/Hemankita1/.sonar/cache
+[INFO] SonarQube version: 8.7.1
+..........
+..........
+[INFO] ANALYSIS SUCCESSFUL, you can browse http://localhost:9000/dashboard?id=ibm.cn%3Aorders-ms-quarkus
+[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
+[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=AXhuUPfKGlc8bxlXLNnl
+[INFO] Analysis total time: 15.409 s
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  18.994 s
+[INFO] Finished at: 2021-03-26T17:05:03+05:30
+[INFO] ------------------------------------------------------------------------
+```
+
+- Now, access http://localhost:9000/, login using the credentials admin/admin, and then you will see something like below.
+
+![Orders SonarQube](static/orders_sonarqube.png?raw=true)
+
+![Orders SonarQube details](static/orders_sonarqube_details.png?raw=true)
 
 ### Exiting the application
 
