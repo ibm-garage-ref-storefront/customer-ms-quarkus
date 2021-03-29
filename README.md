@@ -134,9 +134,9 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-2021-02-19 16:21:58,311 INFO  [io.quarkus] (Quarkus Main Thread) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 1.780s. Listening on: http://localhost:8080
-2021-02-19 16:21:58,314 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-2021-02-19 16:21:58,314 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security]
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 1.559s. Listening on: http://localhost:8080
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, jaeger, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security, smallrye-openapi, smallrye-opentracing, swagger-ui]
 ```
 
 #### Packaging and running the application
@@ -156,20 +156,20 @@ If you want to build an _über-jar_, execute the following command:
 The application is now runnable using the below command.
 
 ```
-java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 ```
 
 If it is run successfully, you will see something like below.
 
 ```
-$ java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+$ java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-2021-02-19 16:24:51,920 INFO  [io.quarkus] (main) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 6.014s. Listening on: http://0.0.0.0:8080
-2021-02-19 16:24:51,922 INFO  [io.quarkus] (main) Profile prod activated.
-2021-02-19 16:24:51,923 INFO  [io.quarkus] (main) Installed features: [cdi, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security]
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 1.559s. Listening on: http://localhost:8080
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, jaeger, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security, smallrye-openapi, smallrye-opentracing, swagger-ui]
 ```
 
 #### Creating a native executable
@@ -186,7 +186,7 @@ Note: If you get errors while executing the above command, refer this [doc](http
 You can then execute your native executable with the below command:
 
 ```
-./target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826
+./target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831
 ```
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
@@ -207,7 +207,7 @@ docker build -f src/main/docker/Dockerfile.jvm -t customer-ms-quarkus .
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -p 8087:8080 customer-ms-quarkus
+docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -e JAEGER_SERVICE_NAME=customer-ms-quarkus -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1 -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -p 8087:8080 customer-ms-quarkus
 ```
 
 - Build the native docker image and run the application.
