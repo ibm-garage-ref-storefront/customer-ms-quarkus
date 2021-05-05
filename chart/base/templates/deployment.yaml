@@ -62,9 +62,9 @@ spec:
             - name: LOG_LEVEL
               value: {{ .Values.logLevel | quote }}
             - name: COUCHDB_HOST
-              value: customer-couchdb-svc-couchdb
+              value: ccustomer-couchdb-couchdb
             - name: COUCHDB_PORT
-              value: "5985"
+              value: "5984"
             - name: COUCHDB_USER
               valueFrom:
                 secretKeyRef:
