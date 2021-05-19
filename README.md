@@ -14,6 +14,8 @@ https://cloudnativereference.dev/*
     + [Get the Customer application](#get-the-customer-application)
     + [Run the CouchDB Docker Container](#run-the-couchdb-docker-container)
     + [Set Up Keycloak](#set-up-keycloak)
+    + [Run the Jaeger Docker Container](#run-the-jaeger-docker-container)
+    + [Run the SonarQube Docker Container](#run-the-sonarqube-docker-container)
     + [Run the Customer application](#run-the-customer-application)
     + [Validating the application](#validating-the-application)
     + [Exiting the application](#exiting-the-application)
@@ -81,13 +83,43 @@ python3 populate.py localhost 5984
 
 In storefront, Keycloak is used for storing users and authenticating users. To configure it, refer [Keycloak - JWT token generation](https://cloudnativereference.dev/related-repositories/keycloak/).
 
+### Run the Jaeger Docker Container
+
+Set up Jaegar for opentracing. This enables distributed tracing in your application.
+
+```
+docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d -p 5775:5775/udp -p 6831:6831/udp -p 6832:6832/udp -p 5778:5778 -p 16686:16686 -p 14268:14268 jaegertracing/all-in-one:latest
+1c127fd5dfd1f4adaf892f041e4db19568ebfcc0b1961bec52a567f963014411
+```
+
+### Run the SonarQube Docker Container
+
+Set up SonarQube for code quality analysis. This will allow you to detect bugs in the code automatically and alerts the developer to fix them.
+
+```
+docker run -d --name sonarqube -p 9000:9000 sonarqube
+```
+
+If it is successfully run, you will see something like this.
+
+```
+$ docker run -d --name sonarqube -p 9000:9000 sonarqube
+1b4ca4e26ceaeacdfd1f4adaf892f041e4db19568ebfcc0b1961b4ca4e26ceae
+```
+
 ### Run the Customer application
 
 #### Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
 ```shell script
-./mvnw compile quarkus:dev -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826
+./mvnw compile quarkus:dev -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831
 ```
 
 If it is successful, you will see something like this.
@@ -102,9 +134,9 @@ __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-2021-02-19 16:21:58,311 INFO  [io.quarkus] (Quarkus Main Thread) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 1.780s. Listening on: http://localhost:8080
-2021-02-19 16:21:58,314 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-2021-02-19 16:21:58,314 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security]
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 1.559s. Listening on: http://localhost:8080
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, jaeger, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security, smallrye-openapi, smallrye-opentracing, swagger-ui]
 ```
 
 #### Packaging and running the application
@@ -124,20 +156,20 @@ If you want to build an _über-jar_, execute the following command:
 The application is now runnable using the below command.
 
 ```
-java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 ```
 
 If it is run successfully, you will see something like below.
 
 ```
-$ java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
+$ java -jar -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831 -jar target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner.jar
 __  ____  __  _____   ___  __ ____  ______
  --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
  -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
 --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-2021-02-19 16:24:51,920 INFO  [io.quarkus] (main) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 6.014s. Listening on: http://0.0.0.0:8080
-2021-02-19 16:24:51,922 INFO  [io.quarkus] (main) Profile prod activated.
-2021-02-19 16:24:51,923 INFO  [io.quarkus] (main) Installed features: [cdi, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security]
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) customer-ms-quarkus 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.11.3.Final) started in 1.559s. Listening on: http://localhost:8080
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+11:07:31 INFO  traceId=, parentId=, spanId=, sampled= [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, jaeger, oidc, rest-client, rest-client-jackson, resteasy, resteasy-jackson, security, smallrye-openapi, smallrye-opentracing, swagger-ui]
 ```
 
 #### Creating a native executable
@@ -154,7 +186,7 @@ Note: If you get errors while executing the above command, refer this [doc](http
 You can then execute your native executable with the below command:
 
 ```
-./target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826
+./target/customer-ms-quarkus-1.0.0-SNAPSHOT-runner -Dibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://localhost:5984 -Dcouchuser=admin -Dcouchpassword=password -Dquarkus.oidc.auth-server-url=http://localhost:8085/auth/realms/sfrealm -Dquarkus.oidc.client-id=bluecomputeweb -Dquarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -DJAEGER_SERVICE_NAME=customer-ms-quarkus -DJAEGER_SAMPLER_TYPE=const -DJAEGER_SAMPLER_PARAM=1 -DJAEGER_AGENT_HOST=localhost -DJAEGER_AGENT_PORT=6831
 ```
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
@@ -175,7 +207,7 @@ docker build -f src/main/docker/Dockerfile.jvm -t customer-ms-quarkus .
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -p 8087:8080 customer-ms-quarkus
+docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -e JAEGER_SERVICE_NAME=customer-ms-quarkus -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1 -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -p 8087:8080 customer-ms-quarkus
 ```
 
 - Build the native docker image and run the application.
@@ -192,7 +224,7 @@ docker build -f src/main/docker/Dockerfile.native -t customer-ms-quarkus-native 
 
 Run the application.
 ```shell script
-docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=a297757d-d2cc-4921-8e66-971432a68826 -p 8087:8080 customer-ms-quarkus-native
+docker run -it -d --rm -e ibm.cn.application.couchdb.client.CouchDBClientService/mp-rest/url=http://host.docker.internal:5984 -e couchuser=admin -e couchpassword=password -e quarkus.oidc.auth-server-url=http://host.docker.internal:8085/auth/realms/sfrealm -e quarkus.oidc.client-id=bluecomputeweb -e quarkus.oidc.credentials.secret=<replace_with_keycloak_client_secret> -e JAEGER_SERVICE_NAME=customer-ms-quarkus -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1 -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -p 8087:8080 customer-ms-quarkus-native
 ```
 
 ### Validating the application
@@ -269,6 +301,81 @@ Note: Unnecessary use of -X or --request, GET is already inferred.
 
 * Connection #0 to host localhost left intact
 ```
+
+- You can access the swagger api at http://localhost:8080/q/swagger-ui/
+
+![Customer swagger api](static/customer_swagger_api.png?raw=true)
+
+Note: If you are running using docker, use `8087` instead of `8080` as port.
+
+- To access Jaeger UI, use http://localhost:16686/ and point the service to `customer-ms-quarkus` to access the traces.
+
+![Customer Jaeger traces](static/customer_jaeger_traces.png?raw=true)
+
+![Customer Jaeger trace details](static/customer_jaeger_trace_details.png?raw=true)
+
+- To perform code quality checks, run the below commands.
+
+Do a clean install to generate necessary artifacts.
+
+```
+./mvnw clean install
+```
+
+If it is successful, you will see something like this.
+
+```
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ customer-ms-quarkus ---
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/customer-ms-quarkus/target/customer-ms-quarkus-1.0.0-SNAPSHOT.jar to /Users/Hemankita1/.m2/repository/ibm/cn/customer-ms-quarkus/1.0.0-SNAPSHOT/customer-ms-quarkus-1.0.0-SNAPSHOT.jar
+[INFO] Installing /Users/Hemankita1/IBM/CN_Ref/Quarkus/customer-ms-quarkus/pom.xml to /Users/Hemankita1/.m2/repository/ibm/cn/customer-ms-quarkus/1.0.0-SNAPSHOT/customer-ms-quarkus-1.0.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  32.439 s
+[INFO] Finished at: 2021-03-29T11:15:53+05:30
+[INFO] ------------------------------------------------------------------------
+```
+
+Now run sonar as follows.
+
+```
+./mvnw sonar:sonar -Dsonar.host.url=http://<sonarqube_host>:<sonarqube_port> -Dsonar.login=<sonarqube_access_token>
+```
+
+To get the sonarqube access token, login to the sonarqube ui. Then go to `User` > `My Account`. Now, select `Security` and then generate a token.
+
+If it is successful, you will see something like this.
+
+```
+$ ./mvnw sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=19abfbce59f1f73b9471ab326163c0e45800a8f3
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ---------------------< ibm.cn:customer-ms-quarkus >---------------------
+[INFO] Building customer-ms-quarkus 1.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- sonar-maven-plugin:3.7.0.1746:sonar (default-cli) @ customer-ms-quarkus ---
+[INFO] User cache: /Users/Hemankita1/.sonar/cache
+[INFO] SonarQube version: 8.7.1
+..........
+..........
+[INFO] ANALYSIS SUCCESSFUL, you can browse http://localhost:9000/dashboard?id=ibm.cn%3Acustomer-ms-quarkus
+[INFO] Note that you will be able to access the updated dashboard once the server has processed the submitted analysis report
+[INFO] More about the report processing at http://localhost:9000/api/ce/task?id=AXh8heIpGlc8bxlXLNnm
+[INFO] Analysis total time: 16.531 s
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  20.859 s
+[INFO] Finished at: 2021-03-29T11:17:32+05:30
+[INFO] ------------------------------------------------------------------------
+```
+
+- Now, access http://localhost:9000/, login using the credentials admin/admin, and then you will see something like below.
+
+![Customer SonarQube](static/customer_sonarqube.png?raw=true)
+
+![Customer SonarQube details](static/customer_sonarqube_details.png?raw=true)
 
 ### Exiting the application
 

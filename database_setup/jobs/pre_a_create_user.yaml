@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: customer-create-user
+  labels:
+    app: "customer"
+spec:
+  template:
+    metadata:
+      name: customer-create-user
+      labels:
+        app: "customer"
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: populate-customer
+        image: ibmcase/bluecompute-bash-curl-ssl:latest
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/bash", "-c" ]
+        args:
+        - >
+            curl -X PUT http://${COUCHDB_USERNAME}:${COUCHDB_PASSWORD}@${COUCHDB_HOST}:${COUCHDB_PORT}/customers &&
+            curl -X PUT http://${COUCHDB_USERNAME}:${COUCHDB_PASSWORD}@${COUCHDB_HOST}:${COUCHDB_PORT}/customers/001 -d "{\"username\": \"user\", \"password\": \"password\", \"firstName\": \"user\", \"lastName\": \"name\", \"email\": \"user@name.com\"}" &&
+            curl -X PUT http://${COUCHDB_USERNAME}:${COUCHDB_PASSWORD}@${COUCHDB_HOST}:${COUCHDB_PORT}/customers/002 -d "{\"username\": \"foo\", \"password\": \"bar\", \"firstName\": \"foo\", \"lastName\": \"bar\", \"email\": \"foo@bar.com\"}"
+        resources:
+          limits:
+            memory: 384Mi
+          requests:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 2000
+        env:
+        - name: COUCHDB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: customer-couchdb-couchdb
+              key: adminPassword
+        - name: COUCHDB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: customer-couchdb-couchdb
+              key: adminUsername
+        - name: COUCHDB_PROTOCOL
+          value: http
+        - name: COUCHDB_HOST
+          value: customer-couchdb-svc-couchdb
+        - name: COUCHDB_PORT
+          value: "5985"
+        - name: COUCHDB_DATABASE
+          value: customers
+        - name: TEST_USER
+          value: "foo"
+        - name: TEST_PASSWORD
+          value: "bar"
+        - name: ADMIN_USER
+          value: "user"
+        - name: ADMIN_PASSWORD
+          value: "password"
