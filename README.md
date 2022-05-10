@@ -51,8 +51,8 @@ The Customer Microservice REST API is OAuth 2.0 protected. These APIs identifies
 - Clone customer repository:
 
 ```bash
-git clone https://github.com/ibm-garage-ref-storefront/customer-ms-openliberty.git
-cd customer-ms-openliberty
+git clone https://github.com/ibm-garage-ref-storefront/customer-ms-quarkus.git
+cd customer-ms-quarkus
 ```
 
 ### Run the CouchDB Docker Container
